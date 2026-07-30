@@ -35,17 +35,15 @@ pipeline {
             }
         }
 
-        stage('Deploy to Kubernetes') {
-            steps {
-                script {
-                    echo "Deploying to Kubernetes..."
-                    sh "kubectl apply -f k8s-manifests.yaml"
-                    sh "kubectl rollout status deployment/task-tracker-api"
-                }
-            }
+  stage('Deploy to Kubernetes') {
+    steps {
+        script {
+            echo "Deploying to Kubernetes..."
+            sh "kubectl apply -f k8s-manifests.yaml --insecure-skip-tls-verify"
+            sh "kubectl rollout status deployment/task-tracker-api"
         }
     }
-
+}
     post {
         always {
             sh "docker logout"
