@@ -35,12 +35,12 @@ pipeline {
             }
         }
 
-  stage('Deploy to Kubernetes') {
+stage('Deploy to Kubernetes') {
     steps {
         script {
             echo "Deploying to Kubernetes..."
-            sh "kubectl apply -f k8s-manifests.yaml --insecure-skip-tls-verify"
-            sh "kubectl rollout status deployment/task-tracker-api"
+            sh "kubectl apply -f k8s-manifests.yaml --insecure-skip-tls-verify=true"
+            sh "kubectl rollout status deployment/task-tracker-api --insecure-skip-tls-verify=true"
         }
     }
 }
