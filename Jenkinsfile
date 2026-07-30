@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
         IMAGE_NAME = 'aaditidigra7483/task-tracker-api'
         BUILD_TAG = "v1.0.${BUILD_NUMBER}"
+        DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
     }
 
     stages {
@@ -27,7 +27,7 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    echo "Logging in and pushing image to Docker Hub..."
+                    echo "Pushing image to Docker Hub..."
                     sh "echo \$DOCKERHUB_CREDENTIALS_PSW | docker login -u \$DOCKERHUB_CREDENTIALS_USR --password-stdin"
                     sh "docker push ${IMAGE_NAME}:${BUILD_TAG}"
                     sh "docker push ${IMAGE_NAME}:latest"
@@ -35,21 +35,23 @@ pipeline {
             }
         }
 
-stage('Deploy to Kubernetes') {
-    steps {
-        script {
-            echo "Deploying to Kubernetes..."
-            sh "kubectl apply -f k8s-manifests.yaml --insecure-skip-tls-verify=true"
-            sh "kubectl rollout status deployment/task-tracker-api --insecure-skip-tls-verify=true"
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    echo "Deploying to Kubernetes..."
+                    sh "kubectl apply -f k8s-manifests.yaml --insecure-skip-tls-verify=true"
+                    sh "kubectl rollout status deployment/task-tracker-api --insecure-skip-tls-verify=true"
+                }
+            }
         }
     }
-}
+
     post {
         always {
-            sh "docker logout"
+            sh "docker logout || true"
         }
         success {
-            echo "CI/CD Pipeline executed successfully!"
+            echo "Pipeline succeeded!"
         }
         failure {
             echo "Pipeline failed. Check build logs."
