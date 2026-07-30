@@ -1,12 +1,9 @@
-# --- Stage 1: Build & Dependencies ---
 FROM node:18-alpine AS builder
 WORKDIR /app
 
-# Copy package files and install dependencies
 COPY package*.json ./
 RUN npm ci --only=production
 
-# --- Stage 2: Production Runtime ---
 FROM node:18-alpine
 WORKDIR /app
 
